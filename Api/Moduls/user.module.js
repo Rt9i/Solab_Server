@@ -6,6 +6,8 @@ const productSchema = new Schema({
     price: Number,
     color: String,
 })
+
+
 const UserSchema = new Schema({
     name: String,
     pass: {

@@ -3,7 +3,7 @@ const { createUser, whatsMyName, getUserByName, getUserByID, getAllUsers, logIn 
 
 const userRouter = Router()
 
-userRouter.post('/createUser', createUser)
+userRouter.post('/createUser', createUser) 
 userRouter.post('/whatsMyName', whatsMyName)
 userRouter.get('/getUserByName', getUserByName)
 userRouter.get('/getUserByID', getUserByID)
