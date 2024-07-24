@@ -10,6 +10,8 @@ const getUserByName = async (req, res) => {
   }
 };
 
+
+
 const getUserByID = async (req, res) => {
   const { id } = req.params; 
   try {
