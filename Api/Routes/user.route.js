@@ -9,4 +9,5 @@ userRouter.get('/getUserByName', getUserByName)
 userRouter.get('/getUserByID', getUserByID)
 userRouter.get('/getAllUsers', getAllUsers)
 userRouter.post('/logIn', logIn)
+
 module.exports = userRouter

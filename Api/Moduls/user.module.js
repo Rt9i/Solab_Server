@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 // mongoose is for the node.js
 // shcema is a class
 const productSchema = new Schema({
+  image: { type: String },
   name: {
     type: String,
     required: true,

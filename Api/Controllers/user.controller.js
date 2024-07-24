@@ -11,7 +11,7 @@ const getUserByName = async (req, res) => {
 };
 
 const getUserByID = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params; 
   try {
     const user = await USER_MODEL.findById(id);
     if (!user) {
