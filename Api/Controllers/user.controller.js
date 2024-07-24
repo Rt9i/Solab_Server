@@ -60,25 +60,24 @@ const getAllUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { userName, phoneNumber, password } = req.body;
-
-  if (!userName || !phoneNumber || !password) {
-    return res
-      .status(400)
-      .json({ error: true, errorMessage: "All fields are required" });
-  }
-
-  try {
-    const user = await USER_MODEL.create({
-      userName,
-      phoneNumber,
-      password,
-    });
-    res.status(201).json({ user });
-  } catch (e) {
-    res.status(500).json({ error: true, errorMessage: e.message });
-  }
-};
+    const { userName, phoneNumber, password } = req.body;
+  
+    if (!userName || !phoneNumber || !password) {
+      return res.status(400).json({ error: true, errorMessage: 'All fields are required' });
+    }
+  
+    try {
+      const user = await USER_MODEL.create({
+        userName, // Ensure `userName` is included here
+        phoneNumber,
+        password,
+      });
+      res.status(201).json({ user });
+    } catch (e) {
+      res.status(500).json({ error: true, errorMessage: e.message });
+    }
+  };
+  
 
 const whatsMyName = (req, res) => {
   const { name, lastName } = req.body;
