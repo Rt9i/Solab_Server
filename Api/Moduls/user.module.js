@@ -1,8 +1,12 @@
 const { Schema, model } = require("mongoose");
+
 // mongoose is for the node.js
 // shcema is a class
 const productSchema = new Schema({
-  image: { type: String },
+  image: {
+    type: String,
+    default: "../photo/profileIcon.png",
+  },
   name: {
     type: String,
     required: true,
@@ -17,7 +21,8 @@ const productSchema = new Schema({
 
 const UserSchema = new Schema({
   userName: {
-    name: String,
+    type: String,
+    required: true,
   },
 
   password: {
