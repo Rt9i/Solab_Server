@@ -10,14 +10,14 @@ const getUserByName = async (req, res) => {
   }
 };
 
-
-
 const getUserByID = async (req, res) => {
-  const { id } = req.params; 
+  const { id } = req.params;
   try {
     const user = await USER_MODEL.findById(id);
     if (!user) {
-      return res.status(404).json({ error: true, errorMessage: "User not found" });
+      return res
+        .status(404)
+        .json({ error: true, errorMessage: "User not found" });
     }
     res.status(200).json(user);
   } catch (e) {
@@ -26,26 +26,29 @@ const getUserByID = async (req, res) => {
 };
 
 const logIn = async (req, res) => {
-    const { phoneNumber, password } = req.body;
-  
-    try {
-   
-      const user = await USER_MODEL.findOne({ phoneNumber });
-  
-      if (!user) {
-        return res.status(404).json({ error: true, errorMessage: "No user found with this phone number" });
-      }
- 
-      if (user.password === password) {
-        return res.status(200).json({ auth: true, user });
-      } else {
-        return res.status(403).json({ auth: false, message: "Invalid password" });
-      }
-    } catch (e) {
-      res.status(500).json({ error: true, errorMessage: e.message });
+  const { phoneNumber, password } = req.body;
+
+  try {
+    const user = await USER_MODEL.findOne({ phoneNumber });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({
+          error: true,
+          errorMessage: "No user found with this phone number",
+        });
     }
-  };
-  
+
+    if (user.password === password) {
+      return res.status(200).json({ auth: true, user });
+    } else {
+      return res.status(403).json({ auth: false, message: "Invalid password" });
+    }
+  } catch (e) {
+    res.status(500).json({ error: true, errorMessage: e.message });
+  }
+};
 
 const getAllUsers = async (req, res) => {
   try {
@@ -57,14 +60,17 @@ const getAllUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { phoneNumber, password } = req.body;
+  const { userName, phoneNumber, password } = req.body;
 
-  if (!phoneNumber || !password) {
-    return res.status(400).json({ error: true, errorMessage: 'Phone number and password are required' });
+  if (!userName || !phoneNumber || !password) {
+    return res
+      .status(400)
+      .json({ error: true, errorMessage: "All fields are required" });
   }
 
   try {
     const user = await USER_MODEL.create({
+      userName,
       phoneNumber,
       password,
     });
@@ -73,7 +79,6 @@ const createUser = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: e.message });
   }
 };
-
 
 const whatsMyName = (req, res) => {
   const { name, lastName } = req.body;
