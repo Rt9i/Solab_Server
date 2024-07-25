@@ -1,6 +1,5 @@
 const USER_MODEL = require("../Moduls/user.module");
 
-
 const getUserByName = async (req, res) => {
   const { name } = req.body;
   try {
@@ -76,14 +75,15 @@ const createUser = async (req, res) => {
 // Update cart data on server
 const updateCartOnServer = async (userId, cartItems) => {
   try {
-    const response = await appFetch('/updateUserProducts', 'POST', { userId, cartItems });
-    console.log('Server response:', response);
+    const response = await appFetch("/updateUserProducts", "POST", {
+      userId,
+      cartItems,
+    });
+    console.log("Server response:", response);
   } catch (error) {
-    console.error('Failed to update cart on server:', error);
+    console.error("Failed to update cart on server:", error);
   }
 };
-
-
 
 const updateUserProducts = async (req, res) => {
   const { userId, cartItems } = req.body;
@@ -106,20 +106,19 @@ const updateUserProducts = async (req, res) => {
 };
 
 const getUserProducts = async (req, res) => {
-    const { userId } = req.params;
-    try {
-      const user = await USER_MODEL.findById(userId);
-      if (!user) {
-        return res
-          .status(404)
-          .json({ error: true, errorMessage: "User not found" });
-      }
-      res.status(200).json({ products: user.products });
-    } catch (e) {
-      res.status(500).json({ error: true, errorMessage: e.message });
+  const { userId } = req.params;
+  try {
+    const user = await USER_MODEL.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ error: true, errorMessage: "User not found" });
     }
-  };
-  
+    res.status(200).json({ products: user.products });
+  } catch (e) {
+    res.status(500).json({ error: true, errorMessage: e.message });
+  }
+};
 
 const getAllUsers = async (req, res) => {
   try {
@@ -155,5 +154,4 @@ module.exports = {
   updateUserProducts,
   getUserProducts,
   updateCartOnServer,
-  
 };
