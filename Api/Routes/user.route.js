@@ -19,6 +19,6 @@ userRouter.get("/getUserByID/:id", getUserByID);
 userRouter.get("/getAllUsers", getAllUsers);
 userRouter.post("/logIn", logIn);
 userRouter.post("/updateUserProducts", updateUserProducts);
-userRouter.get("/getUserProducts/:userId", getUserProducts);
+userRouter.get("/getUserProducts/:id", getUserProducts);
 
 module.exports = userRouter;

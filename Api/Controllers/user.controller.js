@@ -106,19 +106,20 @@ const updateUserProducts = async (req, res) => {
 };
 
 const getUserProducts = async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const user = await USER_MODEL.findById(userId);
-    if (!user) {
-      return res
-        .status(404)
-        .json({ error: true, errorMessage: "User not found" });
+    const { id } = req.params;
+    try {
+      const user = await USER_MODEL.findById(id);
+      if (!user) {
+        return res
+          .status(404)
+          .json({ error: true, errorMessage: "User not found" });
+      }
+      res.status(200).json({ products: user.products });
+    } catch (e) {
+      res.status(500).json({ error: true, errorMessage: e.message });
     }
-    res.status(200).json({ products: user.products });
-  } catch (e) {
-    res.status(500).json({ error: true, errorMessage: e.message });
-  }
-};
+  };
+  
 
 const getAllUsers = async (req, res) => {
   try {
