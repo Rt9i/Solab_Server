@@ -73,41 +73,34 @@ const createUser = async (req, res) => {
   }
 };
 // Update cart data on server
-const updateCartOnServer = async (userId, cartItems) => {
-  try {
-    const response = await  Fetch(`/updateUserProducts/${userId}`, "POST", {
-      products: cartItems,
-    });
-    console.log("Server response:", response);
-  } catch (error) {
-    console.error("Failed to update cart on server:", error);
-  }
-};
+
+  
 
 
 const updateUserProducts = async (req, res) => {
-  const userId = req.params.userId; // Extract userId from URL params
-  const { products } = req.body; // Extract cartItems from request body
-
-  console.log('Received userId:', userId);
-  console.log('Received products:', products);
-
-  try {
-    const user = await USER_MODEL.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ errorMessage: "User not found" });
+    const userId = req.params.userId;
+    const { cartItems } = req.body;
+  
+    console.log('Received cartItems:', cartItems); // Log received cartItems
+  
+    try {
+      const user = await USER_MODEL.findById(userId);
+  
+      if (!user) {
+        return res.status(404).json({ errorMessage: "User not found" });
+      }
+  
+      user.products = cartItems; // Update products with cartItems
+      await user.save(); // Save updated user
+  
+      res.status(200).json({ message: "User products updated successfully" });
+    } catch (error) {
+      console.error('Server error:', error);
+      res.status(500).json({ errorMessage: "Internal Server Error" });
     }
-
-    user.products = products;
-    await user.save();
-
-    res.status(200).json({ message: "User products updated successfully" });
-  } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ errorMessage: "Internal Server Error" });
-  }
-};
+  };
+  
+  
 
 const getUserProducts = async (req, res) => {
   const { id } = req.params;
@@ -160,5 +153,5 @@ module.exports = {
   logIn,
   updateUserProducts,
   getUserProducts,
-  updateCartOnServer,
+  
 };
