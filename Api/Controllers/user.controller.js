@@ -73,7 +73,7 @@ const createUser = async (req, res) => {
   }
 };
 // Update cart data on server
-export const updateCartOnServer = async (userId, cartItems) => {
+const updateCartOnServer = async (userId, cartItems) => {
   try {
     const response = await appFetch('/updateUserProducts', 'POST', { userId, cartItems });
     console.log('Server response:', response);
@@ -153,5 +153,5 @@ module.exports = {
   updateUserProducts,
   getUserProducts,
   updateCartOnServer,
-  loadCart,
+  
 };
