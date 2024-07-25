@@ -75,15 +75,15 @@ const createUser = async (req, res) => {
 // Update cart data on server
 const updateCartOnServer = async (userId, cartItems) => {
   try {
-    const response = await appFetch("/updateUserProducts", "POST", {
-      userId,
-      cartItems,
+    const response = await  Fetch(`/updateUserProducts/${userId}`, "POST", {
+      products: cartItems,
     });
     console.log("Server response:", response);
   } catch (error) {
     console.error("Failed to update cart on server:", error);
   }
 };
+
 
 const updateUserProducts = async (req, res) => {
   const { userId, cartItems } = req.body;
