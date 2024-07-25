@@ -86,23 +86,26 @@ const updateCartOnServer = async (userId, cartItems) => {
 
 
 const updateUserProducts = async (req, res) => {
-  const { userId, cartItems } = req.body;
+  const userId = req.params.userId; // Extract userId from URL params
+  const { products } = req.body; // Extract cartItems from request body
+
+  console.log('Received userId:', userId);
+  console.log('Received products:', products);
 
   try {
     const user = await USER_MODEL.findById(userId);
 
     if (!user) {
-      return res.status(404).send("User not found");
+      return res.status(404).json({ errorMessage: "User not found" });
     }
 
-    // Update the user's products
-    user.products = cartItems;
+    user.products = products;
     await user.save();
 
-    res.status(200).send("User products updated successfully");
+    res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
+    console.error('Server error:', error);
+    res.status(500).json({ errorMessage: "Internal Server Error" });
   }
 };
 
