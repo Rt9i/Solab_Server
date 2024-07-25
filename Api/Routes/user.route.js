@@ -8,7 +8,6 @@ const {
   logIn,
   updateUserProducts,
   getUserProducts,
-
 } = require("../Controllers/user.controller");
 
 const userRouter = Router();
