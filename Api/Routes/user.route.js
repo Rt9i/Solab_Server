@@ -7,9 +7,8 @@ const {
   getAllUsers,
   logIn,
   updateUserProducts,
-  getUserProducts,
   updateCartOnServer,
-  loadCart,
+  getUserProducts,
 } = require("../Controllers/user.controller");
 
 const userRouter = Router();
