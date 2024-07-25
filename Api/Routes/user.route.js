@@ -9,6 +9,7 @@ const {
   updateUserProducts,
   getUserProducts,
   updateCartOnServer,
+  loadCart,
 } = require("../Controllers/user.controller");
 
 const userRouter = Router();
@@ -22,5 +23,6 @@ userRouter.post("/logIn", logIn);
 userRouter.post("/updateUserProducts", updateUserProducts);
 userRouter.get("/getUserProducts/:userId", getUserProducts);
 userRouter.get("/updateCartOnServer/:userId", updateCartOnServer);
+
 
 module.exports = userRouter;

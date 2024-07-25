@@ -73,29 +73,16 @@ const createUser = async (req, res) => {
   }
 };
 // Update cart data on server
-const updateCartOnServer = async (userId, cartItems) => {
+export const updateCartOnServer = async (userId, cartItems) => {
   try {
-    const response = await fetch(
-      "https://solab-server.onrender.com/updateUserProducts",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, cartItems }),
-      }
-    );
-
-    const result = await response.json();
-    if (response.ok) {
-      console.log("Server response:", result);
-    } else {
-      console.error("Failed to update cart on server:", result.errorMessage);
-    }
+    const response = await appFetch('/updateUserProducts', 'POST', { userId, cartItems });
+    console.log('Server response:', response);
   } catch (error) {
-    console.error("Failed to update cart on server:", error);
+    console.error('Failed to update cart on server:', error);
   }
 };
+
+
 
 const updateUserProducts = async (req, res) => {
   const { userId, cartItems } = req.body;
@@ -116,6 +103,7 @@ const updateUserProducts = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 const getUserProducts = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -139,27 +127,6 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: e.message });
   }
 };
-
-// const createUser = async (req, res) => {
-//   const { userName, phoneNumber, password } = req.body;
-
-//   if (!userName || !phoneNumber || !password) {
-//     return res
-//       .status(400)
-//       .json({ error: true, errorMessage: "All fields are required" });
-//   }
-
-//   try {
-//     const user = await USER_MODEL.create({
-//       userName, // Ensure `userName` is included here
-//       phoneNumber,
-//       password,
-//     });
-//     res.status(201).json({ user });
-//   } catch (e) {
-//     res.status(500).json({ error: true, errorMessage: e.message });
-//   }
-// };
 
 const whatsMyName = (req, res) => {
   const { name, lastName } = req.body;
@@ -186,4 +153,5 @@ module.exports = {
   updateUserProducts,
   getUserProducts,
   updateCartOnServer,
+  loadCart,
 };
