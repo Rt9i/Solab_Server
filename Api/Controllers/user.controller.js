@@ -86,7 +86,7 @@ const updateUserProducts = async (req, res) => {
     return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
   }
 
-  console.log('Received cartItems:', cartItems); // Log received cartItems
+  console.log('Received cartItems:', cartItems); // Log received cartItems for debugging
 
   try {
     // Find the user by ID
@@ -112,8 +112,10 @@ const updateUserProducts = async (req, res) => {
       !user.products.some(existingProduct => existingProduct.productId === item.productId)
     );
 
+    // Combine updated products and new products
     user.products = [...updatedProducts, ...newProducts];
 
+    // Save updated user document
     await user.save();
 
     res.status(200).json({ message: "User products updated successfully" });
@@ -122,6 +124,7 @@ const updateUserProducts = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
   }
 };
+
 
 
 const updateUserProductsTest = async (req, res) => {
