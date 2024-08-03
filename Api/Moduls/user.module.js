@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-// Product schema to match the item structure
+// Product schema
 const productSchema = new Schema({
   productId: {
     type: String,
@@ -28,7 +28,7 @@ const productSchema = new Schema({
     default: '',
   },
   category: {
-    type: String, // Array of category strings
+    type: [String], // Array of category strings
     default: [],
   },
   petType: {
@@ -36,6 +36,8 @@ const productSchema = new Schema({
     default: [],
   },
 });
+
+const Product = model("Product", productSchema);
 
 // User schema
 const UserSchema = new Schema({
@@ -52,12 +54,9 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
-  products: {
-    type: Array,
-    default: [],
-  },
+  products: [productSchema], // Use productSchema as a subdocument
 });
 
-const USER_MODEL = model("user", UserSchema);
+const User = model("User", UserSchema);
 
-module.exports = USER_MODEL;
+module.exports = User;
