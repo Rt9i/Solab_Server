@@ -78,27 +78,35 @@ const createUser = async (req, res) => {
 
 
 const updateUserProducts = async (req, res) => {
-    const userId = req.params.userId;
-    const { cartItems } = req.body;
-  
-    console.log('Received cartItems:', cartItems); // Log received cartItems
-  
-    try {
-      const user = await USER_MODEL.findById(userId);
-  
-      if (!user) {
-        return res.status(404).json({ errorMessage: "User not found" });
-      }
-  
-      user.products = cartItems; // Update products with cartItems
-      await user.save(); // Save updated user
-  
-      res.status(200).json({ message: "User products updated successfully" });
-    } catch (error) {
-      console.error('Server error:', error);
-      res.status(500).json({ errorMessage: "Internal Server Error" });
+  const userId = req.params.userId;
+  const { cartItems } = req.body;
+
+  // Validate input
+  if (!Array.isArray(cartItems)) {
+    return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
+  }
+
+  console.log('Received cartItems:', cartItems); // Log received cartItems
+
+  try {
+    // Find the user by ID
+    const user = await USER_MODEL.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
-  };
+
+    // Update products with cartItems
+    user.products = cartItems;
+    await user.save();
+
+    res.status(200).json({ message: "User products updated successfully" });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
+  }
+};
+
 
 const updateUserProductsTest = async (req, res) => {
     const {_id,updated} = req.body;
@@ -119,28 +127,28 @@ const updateUserProductsTest = async (req, res) => {
   
   
 
-  const getUserProducts = async (req, res) => {
-    const { id } = req.params;
-    console.log(`Fetching products for userId: ${id}`); // Debug line
-    
-    try {
-      // Find the user by ID
-      const user = await USER_MODEL.findById(id);
-      console.log("Fetched user:", user); // Debug line
-      
-      // Check if user exists
-      if (!user) {
-        return res.status(404).json({ error: true, errorMessage: "User not found" });
-      }
-  
-      // Respond with the user's products
-      res.status(200).json({ products: user.products });
-    } catch (e) {
-      // Handle errors
-      console.error("Error fetching user products:", e); // Debug line
-      res.status(500).json({ error: true, errorMessage: e.message });
+const getUserProducts = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await USER_MODEL.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
-  };
+
+    // Extract products with quantities
+    const productsWithQuantities = user.products.map(product => ({
+      ...product.toObject(),
+      quantity: product.quantity || 0 // Default quantity to 0 if not present
+    }));
+
+    res.status(200).json({ products: productsWithQuantities });
+  } catch (e) {
+    res.status(500).json({ error: true, errorMessage: e.message });
+  }
+};
+
   
 
 const getAllUsers = async (req, res) => {
