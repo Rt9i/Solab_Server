@@ -13,11 +13,11 @@ const productSchema = new Schema({
   },
   salePrice: { // Add salePrice field
     type: Number,
-    default: 0,
+    default: null,
   },
-  saleAmount: { // Add saleAmount field
+  saleAmmount: { // Add saleAmount field
     type: Number,
-    default: 0,
+    default: null,
   },
   brand: {
     type: String,
