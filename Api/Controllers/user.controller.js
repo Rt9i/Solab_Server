@@ -96,8 +96,24 @@ const updateUserProducts = async (req, res) => {
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Update products with cartItems
-    user.products = cartItems;
+    // Update or add products in the user's products array
+    const updatedProducts = user.products.map(existingProduct => {
+      // Find cart item with matching productId
+      const cartItem = cartItems.find(item => item.productId === existingProduct.productId);
+      if (cartItem) {
+        // Update quantity or any other details if item exists in the cart
+        return { ...existingProduct, ...cartItem };
+      }
+      return existingProduct; // Return existing product if not in cartItems
+    });
+
+    // Add new products that are not in the user's existing products
+    const newProducts = cartItems.filter(item => 
+      !user.products.some(existingProduct => existingProduct.productId === item.productId)
+    );
+
+    user.products = [...updatedProducts, ...newProducts];
+
     await user.save();
 
     res.status(200).json({ message: "User products updated successfully" });

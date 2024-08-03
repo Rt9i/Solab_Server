@@ -11,6 +11,14 @@ const productSchema = new Schema({
     type: Number,
     required: true,
   },
+  salePrice: { // Add salePrice field
+    type: Number,
+    default: 0,
+  },
+  saleAmount: { // Add saleAmount field
+    type: Number,
+    default: 0,
+  },
   brand: {
     type: String,
     default: '',
@@ -39,9 +47,7 @@ const productSchema = new Schema({
     type: [String], 
     default: [],
   },
-
 });
-
 
 const Product = model("Product", productSchema);
 
