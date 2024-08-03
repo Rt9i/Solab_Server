@@ -27,6 +27,10 @@ const productSchema = new Schema({
     type: String,
     default: '',
   },
+  quantity: { // Add quantity field
+    type: Number,
+    default: 1,
+  },
   category: {
     type: [String], // Array of category strings
     default: [],
@@ -35,10 +39,7 @@ const productSchema = new Schema({
     type: [String], 
     default: [],
   },
-  quantity: { // Add quantity field
-    type: Number,
-    default: 1,
-  },
+
 });
 
 
