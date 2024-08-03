@@ -119,25 +119,29 @@ const updateUserProductsTest = async (req, res) => {
   
   
 
-const getUserProducts = async (req, res) => {
-  const { id } = req.params;
-  console.log(`Fetching products for userId: ${id}`); // Debug line
-  try {
-    const user = await USER_MODEL.findById(id);
-    console.log("Fetched user:", user); // Debug line
-    if (!user) {
-      return res
-        .status(404)
-        .json({ error: true, errorMessage: "User not found" });
+  const getUserProducts = async (req, res) => {
+    const { id } = req.params;
+    console.log(`Fetching products for userId: ${id}`); // Debug line
+    
+    try {
+      // Find the user by ID
+      const user = await USER_MODEL.findById(id);
+      console.log("Fetched user:", user); // Debug line
+      
+      // Check if user exists
+      if (!user) {
+        return res.status(404).json({ error: true, errorMessage: "User not found" });
+      }
+  
+      // Respond with the user's products
+      res.status(200).json({ products: user.products });
+    } catch (e) {
+      // Handle errors
+      console.error("Error fetching user products:", e); // Debug line
+      res.status(500).json({ error: true, errorMessage: e.message });
     }
-    res.status(200).json({ products: user.products });
-  } catch (e) {
-    console.error("Error fetching user products:", e); // Debug line
-    res.status(500).json({ error: true, errorMessage: e.message });
-  }
-  console.log('Fetched user products:', response);
-
-};
+  };
+  
 
 const getAllUsers = async (req, res) => {
   try {
