@@ -99,6 +99,23 @@ const updateUserProducts = async (req, res) => {
       res.status(500).json({ errorMessage: "Internal Server Error" });
     }
   };
+
+const updateUserProductsTest = async (req, res) => {
+    const {_id,updated} = req.body;
+    try {
+      const user =await USER_MODEL.updateOne({_id},updated,{runValidators:true})
+      res.status(200).json({ 
+        message: "User products updated successfully",
+        updated: user
+      });
+    } catch (error) {
+      console.error('Server error:', error);
+      res.status(500).json({
+         errorMessage: "Internal Server Error" ,
+         message:error.message
+        });
+    }
+  };
   
   
 
@@ -118,6 +135,8 @@ const getUserProducts = async (req, res) => {
     console.error("Error fetching user products:", e); // Debug line
     res.status(500).json({ error: true, errorMessage: e.message });
   }
+  console.log('Fetched user products:', response);
+
 };
 
 const getAllUsers = async (req, res) => {
@@ -153,5 +172,5 @@ module.exports = {
   logIn,
   updateUserProducts,
   getUserProducts,
-  
+  updateUserProductsTest
 };

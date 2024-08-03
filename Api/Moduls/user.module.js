@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 
 // Product schema to match the item structure
 const productSchema = new Schema({
-  productId: { // Renamed from id to avoid confusion with MongoDB's _id
+  productId: {
     type: String,
     required: true,
     unique: true,
@@ -28,7 +28,7 @@ const productSchema = new Schema({
     default: '',
   },
   category: {
-    type: [String], // Array of category strings
+    type: String, // Array of category strings
     default: [],
   },
   petType: {
@@ -53,7 +53,12 @@ const UserSchema = new Schema({
     unique: true,
   },
   products: {
-    type: [productSchema], // Array of products
+    type: [
+      {
+        productId: { type: String, required: true },
+        quantity: { type: Number, required: true },
+      },
+    ],
     default: [],
   },
 });
