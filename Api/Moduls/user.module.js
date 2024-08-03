@@ -1,11 +1,11 @@
 const { Schema, model } = require("mongoose");
 
-// Define the product schema
+// Product schema to match the item structure
 const productSchema = new Schema({
   productId: {
-    type: Schema.Types.ObjectId, // Use ObjectId for MongoDB references
-    ref: 'Product', // Reference to the Product model
+    type: String,
     required: true,
+    unique: true,
   },
   price: {
     type: Number,
@@ -13,35 +13,31 @@ const productSchema = new Schema({
   },
   brand: {
     type: String,
+    default: '',
   },
   taste: {
     type: String,
+    default: '',
   },
   img: {
     type: String, // URL to the image
+    default: '',
   },
   dis: {
     type: String,
+    default: '',
   },
   category: {
-    type: String,
+    type: String, // Array of category strings
+    default: [],
   },
   petType: {
-    type: [String], // Array of pet type strings
-  },
-  quantity: {
-    type: Number,
-    required: true,
-  },
-  saleAmmount: {
-    type: Number,
-  },
-  salePrice: {
-    type: Number,
+    type: [String], 
+    default: [],
   },
 });
 
-// Define the user schema
+// User schema
 const UserSchema = new Schema({
   userName: {
     type: String,
@@ -56,9 +52,12 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
-  products: [productSchema], // Array of product subdocuments
+  products: {
+    type: Array,
+    default: [],
+  },
 });
 
-const USER_MODEL = model("User", UserSchema);
+const USER_MODEL = model("user", UserSchema);
 
 module.exports = USER_MODEL;
