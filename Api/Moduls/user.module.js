@@ -35,7 +35,12 @@ const productSchema = new Schema({
     type: [String], 
     default: [],
   },
+  quantity: { // Add quantity field
+    type: Number,
+    default: 1,
+  },
 });
+
 
 const Product = model("Product", productSchema);
 
