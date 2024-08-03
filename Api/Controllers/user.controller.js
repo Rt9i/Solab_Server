@@ -131,7 +131,7 @@ const getUserProducts = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const user = await USER_MODEL.findById(id);
+    const user = await USER_MODEL.findById(id).lean(); // Use .lean() to get plain JavaScript objects
 
     if (!user) {
       return res.status(404).json({ error: true, errorMessage: "User not found" });
@@ -139,7 +139,7 @@ const getUserProducts = async (req, res) => {
 
     // Extract products with quantities
     const productsWithQuantities = user.products.map(product => ({
-      ...product.toObject(),
+      ...product,
       quantity: product.quantity || 0 // Default quantity to 0 if not present
     }));
 
@@ -148,6 +148,7 @@ const getUserProducts = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: e.message });
   }
 };
+
 
   
 
