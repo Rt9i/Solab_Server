@@ -93,6 +93,7 @@ const updateUserProducts = async (req, res) => {
     const user = await USER_MODEL.findById(userId);
 
     if (!user) {
+      console.log('User not found:', userId);
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
@@ -114,7 +115,9 @@ const updateUserProducts = async (req, res) => {
     console.log('User products after update:', user.products); // Log updated products for debugging
 
     // Save updated user document
-    await user.save();
+    const updatedUser = await user.save();
+
+    console.log('User document saved:', updatedUser); // Log the saved document
 
     res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
