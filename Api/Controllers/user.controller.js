@@ -161,47 +161,31 @@ const updateUserProductsTest = async (req, res) => {
     const { id } = req.params;
   
     try {
-      // Fetch the user with products
       const user = await USER_MODEL.findById(id).lean(); // Use .lean() to get plain JavaScript objects
   
       if (!user) {
         return res.status(404).json({ error: true, errorMessage: "User not found" });
       }
   
-      // Check if products array exists
-      if (!user.products || !Array.isArray(user.products)) {
-        return res.status(500).json({ error: true, errorMessage: "User products data is not valid" });
-      }
+      // Ensure products are unique by productId
+      const uniqueProductsMap = user.products.reduce((map, product) => {
+        if (product.productId) {
+          map[product.productId] = product; // Map productId to product
+        }
+        return map;
+      }, {});
   
-      // Log the fetched user data for debugging
-      console.log('Fetched user:', user);
+      // Convert map values to array
+      const uniqueProducts = Object.values(uniqueProductsMap);
   
-      // Extract products with quantities and ensure unique productId
-      const productsWithQuantities = user.products.map(product => {
-        console.log('Processing product:', product); // Log each product for debugging
-        return {
-          ...product,
-          quantity: product.quantity || 0 // Default quantity to 0 if not present
-        };
-      });
-  
-      // Log the products with quantities for debugging
-      console.log('Products with quantities:', productsWithQuantities);
-  
-      // Ensure products have unique productId
-      const uniqueProducts = productsWithQuantities.filter((product, index, self) =>
-        index === self.findIndex((p) => p.productId === product.productId)
-      );
-  
-      // Log the unique products for debugging
-      console.log('Unique products:', uniqueProducts);
-  
+      // Return the unique products
       res.status(200).json({ products: uniqueProducts });
     } catch (e) {
-      console.error('Error fetching user products:', e);
+      console.error('Server error:', e);
       res.status(500).json({ error: true, errorMessage: e.message });
     }
   };
+  
   
   
 
