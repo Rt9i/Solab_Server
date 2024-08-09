@@ -81,6 +81,7 @@ const updateUserProducts = async (req, res) => {
   const userId = req.params.userId;
   const { cartItems } = req.body;
 
+  // Validate input
   if (!Array.isArray(cartItems)) {
     return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
   }
@@ -88,46 +89,36 @@ const updateUserProducts = async (req, res) => {
   console.log('Received cartItems:', cartItems);
 
   try {
-    const user = await USER_MODEL.findById(userId);
+    // Find the user by ID
+    const user = await User.findById(userId);
 
     if (!user) {
-      console.log('User not found:', userId);
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Validate cartItems for unique productIds
-    const productIds = new Set();
-    const invalidItems = cartItems.filter(item => {
-      if (productIds.has(item.productId)) {
-        console.error('Duplicate productId found:', item.productId);
-        return true;
-      }
-      productIds.add(item.productId);
-      return false;
-    });
-
-    if (invalidItems.length > 0) {
-      console.error('Invalid items due to duplicate IDs:', invalidItems);
-      return res.status(400).json({ error: true, errorMessage: "Duplicate product IDs found" });
+    // Handle empty cart scenario
+    if (cartItems.length === 0) {
+      user.products = [];
+    } else {
+      // Map cartItems to productSchema format
+      user.products = cartItems.map(item => ({
+        productId: item.id,
+        price: item.price,
+        brand: item.brand,
+        taste: item.taste,
+        img: item.img,
+        dis: item.dis,
+        quantity: item.quantity,
+        category: item.category,
+        petType: item.petType,
+        saleAmmount: item.saleAmmount,
+        salePrice: item.salePrice,
+      }));
     }
-
-    // Replace the user's products with the new cartItems
-    user.products = cartItems.map(item => ({
-      productId: item.productId,
-      price: item.price,
-      brand: item.brand,
-      taste: item.taste,
-      img: item.img,
-      dis: item.dis,
-      category: item.category,
-      petType: item.petType,
-      quantity: item.quantity,
-      saleAmmount: item.saleAmmount,
-      salePrice: item.salePrice,
-    }));
 
     console.log('User products after update:', user.products);
 
+    // Save updated user document
     const updatedUser = await user.save();
 
     console.log('User document saved:', updatedUser);
@@ -138,6 +129,7 @@ const updateUserProducts = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
   }
 };
+
 
 
 
