@@ -19,7 +19,7 @@ userRouter.get("/getUserByName", getUserByName); // Use query parameters for GET
 userRouter.get("/getUserByID/:id", getUserByID);
 userRouter.get("/getAllUsers", getAllUsers);
 userRouter.post("/logIn", logIn);
-userRouter.post('/updateUserProducts', updateUserProducts);
+userRouter.post('/updateUserProducts/:userId', updateUserProducts);
 userRouter.get("/getUserProducts/:id", getUserProducts); 
 userRouter.post("/updateUserProductsTest", updateUserProductsTest); 
 

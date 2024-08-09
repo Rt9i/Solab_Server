@@ -86,42 +86,47 @@ const updateUserProducts = async (req, res) => {
     return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
   }
 
-  console.log('Received cartItems:', cartItems);
-
   try {
     // Find the user by ID
-    const user = await User.findById(userId);
+    const user = await USER_MODEL.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Handle empty cart scenario
+    // Handle empty cartItems
     if (cartItems.length === 0) {
       user.products = [];
     } else {
-      // Map cartItems to productSchema format
-      user.products = cartItems.map(item => ({
-        productId: item.id,
-        price: item.price,
-        brand: item.brand,
-        taste: item.taste,
-        img: item.img,
-        dis: item.dis,
-        quantity: item.quantity,
-        category: item.category,
-        petType: item.petType,
-        saleAmmount: item.saleAmmount,
-        salePrice: item.salePrice,
-      }));
+      // Process cartItems and ensure no duplicate product IDs
+      const productIds = new Set();
+      const processedItems = cartItems.reduce((acc, item) => {
+        if (!productIds.has(item.productId)) {
+          productIds.add(item.productId);
+          acc.push({
+            productId: item.productId,
+            price: item.price,
+            brand: item.brand,
+            taste: item.taste,
+            img: item.img,
+            dis: item.dis,
+            category: item.category,
+            petType: item.petType,
+            quantity: item.quantity,
+            saleAmmount: item.saleAmmount,
+            salePrice: item.salePrice,
+          });
+        } else {
+          console.warn(`Duplicate product ID found: ${item.productId}`);
+        }
+        return acc;
+      }, []);
+
+      user.products = processedItems;
     }
 
-    console.log('User products after update:', user.products);
-
     // Save updated user document
-    const updatedUser = await user.save();
-
-    console.log('User document saved:', updatedUser);
+    await user.save();
 
     res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
