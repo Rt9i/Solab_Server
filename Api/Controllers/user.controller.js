@@ -86,49 +86,46 @@ const updateUserProducts = async (req, res) => {
     return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
   }
 
-  console.log('Received cartItems:', cartItems);
+  console.log('Received cartItems:', cartItems); // Log received cartItems for debugging
 
   try {
     // Find the user by ID
-    const user = await User.findById(userId);
+    const user = await USER_MODEL.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Handle empty cart scenario
-    if (cartItems.length === 0) {
-      user.products = [];
-    } else {
-      // Map cartItems to productSchema format
-      user.products = cartItems.map(item => ({
-        productId: item.id,
-        price: item.price,
-        brand: item.brand,
-        taste: item.taste,
-        img: item.img,
-        dis: item.dis,
-        quantity: item.quantity,
-        category: item.category,
-        petType: item.petType,
-        saleAmmount: item.saleAmmount,
-        salePrice: item.salePrice,
-      }));
-    }
+    // Clear existing products
+    user.products = [];
 
-    console.log('User products after update:', user.products);
+    // Add new products
+    user.products.push(...cartItems.map(item => ({
+      productId: item.productId,
+      price: item.price,
+      brand: item.brand,
+      taste: item.taste,
+      img: item.img,
+      dis: item.dis,
+      category: item.category,
+      petType: item.petType,
+      quantity: item.quantity,
+      saleAmmount: item.saleAmmount,
+      salePrice: item.salePrice,
+    })));
+
+    console.log('User products after update:', user.products); // Log updated products for debugging
 
     // Save updated user document
-    const updatedUser = await user.save();
-
-    console.log('User document saved:', updatedUser);
+    await user.save();
 
     res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
     console.error('Server error:', error);
-    res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
+    res.status(500).json({ error: true, errorMessage: error.message || "Internal Server Error" });
   }
 };
+
 
 
 
