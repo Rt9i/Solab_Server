@@ -182,7 +182,7 @@ const getUserProducts = async (req, res) => {
 
     // Transform products to match app's expected format
     const transformedProducts = uniqueProducts.map(product => ({
-      id: product.productId, // Change productId to id
+      id: product.productId, 
       price: product.price,
       brand: product.brand,
       taste: product.taste,
