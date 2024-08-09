@@ -81,7 +81,6 @@ const updateUserProducts = async (req, res) => {
   const userId = req.params.userId;
   const { cartItems } = req.body;
 
-  // Validate input
   if (!Array.isArray(cartItems)) {
     return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
   }
@@ -89,36 +88,46 @@ const updateUserProducts = async (req, res) => {
   console.log('Received cartItems:', cartItems);
 
   try {
-    // Find the user by ID
-    const user = await User.findById(userId);
+    const user = await USER_MODEL.findById(userId);
 
     if (!user) {
+      console.log('User not found:', userId);
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Handle empty cart scenario
-    if (cartItems.length === 0) {
-      user.products = [];
-    } else {
-      // Map cartItems to productSchema format
-      user.products = cartItems.map(item => ({
-        productId: item.id,
-        price: item.price,
-        brand: item.brand,
-        taste: item.taste,
-        img: item.img,
-        dis: item.dis,
-        quantity: item.quantity,
-        category: item.category,
-        petType: item.petType,
-        saleAmmount: item.saleAmmount,
-        salePrice: item.salePrice,
-      }));
+    // Validate cartItems for unique productIds
+    const productIds = new Set();
+    const invalidItems = cartItems.filter(item => {
+      if (productIds.has(item.productId)) {
+        console.error('Duplicate productId found:', item.productId);
+        return true;
+      }
+      productIds.add(item.productId);
+      return false;
+    });
+
+    if (invalidItems.length > 0) {
+      console.error('Invalid items due to duplicate IDs:', invalidItems);
+      return res.status(400).json({ error: true, errorMessage: "Duplicate product IDs found" });
     }
+
+    // Replace the user's products with the new cartItems
+    user.products = cartItems.map(item => ({
+      productId: item.productId,
+      price: item.price,
+      brand: item.brand,
+      taste: item.taste,
+      img: item.img,
+      dis: item.dis,
+      category: item.category,
+      petType: item.petType,
+      quantity: item.quantity,
+      saleAmmount: item.saleAmmount,
+      salePrice: item.salePrice,
+    }));
 
     console.log('User products after update:', user.products);
 
-    // Save updated user document
     const updatedUser = await user.save();
 
     console.log('User document saved:', updatedUser);
@@ -129,7 +138,6 @@ const updateUserProducts = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
   }
 };
-
 
 
 
@@ -157,52 +165,27 @@ const updateUserProductsTest = async (req, res) => {
   
   
 
-  const getUserProducts = async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      // Fetch the user with products
-      const user = await USER_MODEL.findById(id).lean(); // Use .lean() to get plain JavaScript objects
-  
-      if (!user) {
-        return res.status(404).json({ error: true, errorMessage: "User not found" });
-      }
-  
-      // Check if products array exists
-      if (!user.products || !Array.isArray(user.products)) {
-        return res.status(500).json({ error: true, errorMessage: "User products data is not valid" });
-      }
-  
-      // Log the fetched user data for debugging
-      console.log('Fetched user:', user);
-  
-      // Extract products with quantities and ensure unique productId
-      const productsWithQuantities = user.products.map(product => {
-        console.log('Processing product:', product); // Log each product for debugging
-        return {
-          ...product,
-          quantity: product.quantity || 0 // Default quantity to 0 if not present
-        };
-      });
-  
-      // Log the products with quantities for debugging
-      console.log('Products with quantities:', productsWithQuantities);
-  
-      // Ensure products have unique productId
-      const uniqueProducts = productsWithQuantities.filter((product, index, self) =>
-        index === self.findIndex((p) => p.productId === product.productId)
-      );
-  
-      // Log the unique products for debugging
-      console.log('Unique products:', uniqueProducts);
-  
-      res.status(200).json({ products: uniqueProducts });
-    } catch (e) {
-      console.error('Error fetching user products:', e);
-      res.status(500).json({ error: true, errorMessage: e.message });
+const getUserProducts = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await USER_MODEL.findById(id).lean(); // Use .lean() to get plain JavaScript objects
+
+    if (!user) {
+      return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
-  };
-  
+
+    // Extract products with quantities
+    const productsWithQuantities = user.products.map(product => ({
+      ...product,
+      quantity: product.quantity || 0 // Default quantity to 0 if not present
+    }));
+
+    res.status(200).json({ products: productsWithQuantities });
+  } catch (e) {
+    res.status(500).json({ error: true, errorMessage: e.message });
+  }
+};
 
 
   
