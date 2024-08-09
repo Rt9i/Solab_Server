@@ -74,77 +74,82 @@ const createUser = async (req, res) => {
 };
 // Update cart data on server
 
-  
-
-
 const updateUserProducts = async (req, res) => {
   const userId = req.params.userId;
   const { cartItems } = req.body;
 
   // Validate input
   if (!Array.isArray(cartItems)) {
-    return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
+    return res
+      .status(400)
+      .json({ error: true, errorMessage: "cartItems must be an array" });
   }
 
-  console.log('Received cartItems:', cartItems); // Log received cartItems for debugging
+  console.log("Received cartItems:", cartItems); // Log received cartItems for debugging
 
   try {
     // Find the user by ID
     const user = await USER_MODEL.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ error: true, errorMessage: "User not found" });
+      return res
+        .status(404)
+        .json({ error: true, errorMessage: "User not found" });
     }
 
-    // Update or add products in the user's products array
-    const updatedProducts = user.products.map(existingProduct => {
-      // Find cart item with matching productId
-      const cartItem = cartItems.find(item => item.productId === existingProduct.productId);
-      if (cartItem) {
-        // Update quantity or any other details if item exists in the cart
-        return { ...existingProduct, ...cartItem };
-      }
-      return existingProduct; // Return existing product if not in cartItems
-    });
+    // Update or clear products based on cartItems
+    if (cartItems.length === 0) {
+      // Clear products if cartItems is empty
+      user.products = [];
+    } else {
+      // Replace the user's products with new cartItems
+      user.products = cartItems.map((item) => ({
+        productId: item.productId,
+        price: item.price,
+        brand: item.brand,
+        taste: item.taste,
+        img: item.img,
+        dis: item.dis,
+        category: item.category,
+        petType: item.petType,
+        quantity: item.quantity,
+        saleAmmount: item.saleAmmount,
+        salePrice: item.salePrice,
+      }));
+    }
 
-    // Add new products that are not in the user's existing products
-    const newProducts = cartItems.filter(item => 
-      !user.products.some(existingProduct => existingProduct.productId === item.productId)
-    );
-
-    // Combine updated products and new products
-    user.products = [...updatedProducts, ...newProducts];
+    console.log("User products after update:", user.products); // Log updated products for debugging
 
     // Save updated user document
     await user.save();
 
     res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
+    console.error("Server error:", error);
+    res
+      .status(500)
+      .json({ error: true, errorMessage: "Internal Server Error" });
   }
 };
 
-
-
 const updateUserProductsTest = async (req, res) => {
-    const {_id,updated} = req.body;
-    try {
-      const user =await USER_MODEL.updateOne({_id},updated,{runValidators:true})
-      res.status(200).json({ 
-        message: "User products updated successfully",
-        updated: user
-      });
-    } catch (error) {
-      console.error('Server error:', error);
-      res.status(500).json({
-         errorMessage: "Internal Server Error" ,
-         message:error.message
-        });
-    }
-  };
-  
-  
+  const { _id, updated } = req.body;
+  try {
+    const user = await USER_MODEL.updateOne({ _id }, updated, {
+      runValidators: true,
+    });
+    res.status(200).json({
+      message: "User products updated successfully",
+      updated: user,
+    });
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({
+      errorMessage: "Internal Server Error",
+      message: error.message,
+    });
+  }
+};
 
 const getUserProducts = async (req, res) => {
   const { id } = req.params;
@@ -153,13 +158,15 @@ const getUserProducts = async (req, res) => {
     const user = await USER_MODEL.findById(id).lean(); // Use .lean() to get plain JavaScript objects
 
     if (!user) {
-      return res.status(404).json({ error: true, errorMessage: "User not found" });
+      return res
+        .status(404)
+        .json({ error: true, errorMessage: "User not found" });
     }
 
     // Extract products with quantities
-    const productsWithQuantities = user.products.map(product => ({
+    const productsWithQuantities = user.products.map((product) => ({
       ...product,
-      quantity: product.quantity || 0 // Default quantity to 0 if not present
+      quantity: product.quantity || 0, // Default quantity to 0 if not present
     }));
 
     res.status(200).json({ products: productsWithQuantities });
@@ -167,9 +174,6 @@ const getUserProducts = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: e.message });
   }
 };
-
-
-  
 
 const getAllUsers = async (req, res) => {
   try {
@@ -204,5 +208,5 @@ module.exports = {
   logIn,
   updateUserProducts,
   getUserProducts,
-  updateUserProductsTest
+  updateUserProductsTest,
 };
