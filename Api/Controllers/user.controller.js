@@ -95,31 +95,36 @@ const updateUserProducts = async (req, res) => {
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Clear products if cartItems is empty
-    if (cartItems.length === 0) {
-      user.products = [];
-    } else {
-      // Map and validate cartItems
-      user.products = cartItems.map(item => {
-        if (!item.productId || !item.price || !item.quantity) {
-          console.error('Invalid item found:', item);
-          throw new Error('Invalid item data');
-        }
-        return {
-          productId: item.productId,
-          price: item.price,
-          brand: item.brand,
-          taste: item.taste,
-          img: item.img,
-          dis: item.dis,
-          category: item.category,
-          petType: item.petType,
-          quantity: item.quantity,
-          saleAmmount: item.saleAmmount,
-          salePrice: item.salePrice,
-        };
-      });
+    // Validate cartItems for unique productIds
+    const productIds = new Set();
+    const invalidItems = cartItems.filter(item => {
+      if (productIds.has(item.productId)) {
+        console.error('Duplicate productId found:', item.productId);
+        return true;
+      }
+      productIds.add(item.productId);
+      return false;
+    });
+
+    if (invalidItems.length > 0) {
+      console.error('Invalid items due to duplicate IDs:', invalidItems);
+      return res.status(400).json({ error: true, errorMessage: "Duplicate product IDs found" });
     }
+
+    // Replace the user's products with the new cartItems
+    user.products = cartItems.map(item => ({
+      productId: item.productId,
+      price: item.price,
+      brand: item.brand,
+      taste: item.taste,
+      img: item.img,
+      dis: item.dis,
+      category: item.category,
+      petType: item.petType,
+      quantity: item.quantity,
+      saleAmmount: item.saleAmmount,
+      salePrice: item.salePrice,
+    }));
 
     console.log('User products after update:', user.products);
 
@@ -133,6 +138,7 @@ const updateUserProducts = async (req, res) => {
     res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
   }
 };
+
 
 
 
