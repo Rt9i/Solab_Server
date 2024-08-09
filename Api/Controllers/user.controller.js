@@ -81,15 +81,13 @@ const updateUserProducts = async (req, res) => {
   const userId = req.params.userId;
   const { cartItems } = req.body;
 
-  // Validate input
   if (!Array.isArray(cartItems)) {
     return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
   }
 
-  console.log('Received cartItems:', cartItems); // Log received cartItems for debugging
+  console.log('Received cartItems:', cartItems);
 
   try {
-    // Find the user by ID
     const user = await USER_MODEL.findById(userId);
 
     if (!user) {
@@ -97,27 +95,37 @@ const updateUserProducts = async (req, res) => {
       return res.status(404).json({ error: true, errorMessage: "User not found" });
     }
 
-    // Replace the user's products with the new cartItems
-    user.products = cartItems.map(item => ({
-      productId: item.productId,
-      price: item.price,
-      brand: item.brand,
-      taste: item.taste,
-      img: item.img,
-      dis: item.dis,
-      category: item.category,
-      petType: item.petType,
-      quantity: item.quantity,
-      saleAmmount: item.saleAmmount,
-      salePrice: item.salePrice,
-    }));
+    // Clear products if cartItems is empty
+    if (cartItems.length === 0) {
+      user.products = [];
+    } else {
+      // Map and validate cartItems
+      user.products = cartItems.map(item => {
+        if (!item.productId || !item.price || !item.quantity) {
+          console.error('Invalid item found:', item);
+          throw new Error('Invalid item data');
+        }
+        return {
+          productId: item.productId,
+          price: item.price,
+          brand: item.brand,
+          taste: item.taste,
+          img: item.img,
+          dis: item.dis,
+          category: item.category,
+          petType: item.petType,
+          quantity: item.quantity,
+          saleAmmount: item.saleAmmount,
+          salePrice: item.salePrice,
+        };
+      });
+    }
 
-    console.log('User products after update:', user.products); // Log updated products for debugging
+    console.log('User products after update:', user.products);
 
-    // Save updated user document
     const updatedUser = await user.save();
 
-    console.log('User document saved:', updatedUser); // Log the saved document
+    console.log('User document saved:', updatedUser);
 
     res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
