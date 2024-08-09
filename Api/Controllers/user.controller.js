@@ -74,16 +74,15 @@ const createUser = async (req, res) => {
 };
 // Update cart data on server
 
-  
-
-
 const updateUserProducts = async (req, res) => {
   const userId = req.params.userId;
   const { cartItems } = req.body;
 
   // Validate input
   if (!Array.isArray(cartItems)) {
-    return res.status(400).json({ error: true, errorMessage: "cartItems must be an array" });
+    return res
+      .status(400)
+      .json({ error: true, errorMessage: "cartItems must be an array" });
   }
 
   try {
@@ -91,7 +90,9 @@ const updateUserProducts = async (req, res) => {
     const user = await USER_MODEL.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ error: true, errorMessage: "User not found" });
+      return res
+        .status(404)
+        .json({ error: true, errorMessage: "User not found" });
     }
 
     // Handle empty cartItems
@@ -130,46 +131,42 @@ const updateUserProducts = async (req, res) => {
 
     res.status(200).json({ message: "User products updated successfully" });
   } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ error: true, errorMessage: "Internal Server Error" });
+    console.error("Server error:", error);
+    res
+      .status(500)
+      .json({ error: true, errorMessage: "Internal Server Error" });
   }
 };
 
-
-
-
-
-
-
-
-
 const updateUserProductsTest = async (req, res) => {
-    const {_id,updated} = req.body;
-    try {
-      const user =await USER_MODEL.updateOne({_id},updated,{runValidators:true})
-      res.status(200).json({ 
-        message: "User products updated successfully",
-        updated: user
-      });
-    } catch (error) {
-      console.error('Server error:', error);
-      res.status(500).json({
-         errorMessage: "Internal Server Error" ,
-         message:error.message
-        });
-    }
-  };
-  
-  
+  const { _id, updated } = req.body;
+  try {
+    const user = await USER_MODEL.updateOne({ _id }, updated, {
+      runValidators: true,
+    });
+    res.status(200).json({
+      message: "User products updated successfully",
+      updated: user,
+    });
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({
+      errorMessage: "Internal Server Error",
+      message: error.message,
+    });
+  }
+};
 
-  const getUserProducts = async (req, res) => {
+const getUserProducts = async (req, res) => {
   const { id } = req.params;
 
   try {
     const user = await USER_MODEL.findById(id).lean(); // Use .lean() to get plain JavaScript objects
 
     if (!user) {
-      return res.status(404).json({ error: true, errorMessage: "User not found" });
+      return res
+        .status(404)
+        .json({ error: true, errorMessage: "User not found" });
     }
 
     // Ensure products are unique by productId
@@ -183,19 +180,29 @@ const updateUserProductsTest = async (req, res) => {
     // Convert map values to array
     const uniqueProducts = Object.values(uniqueProductsMap);
 
-    // Return the unique products
-    res.status(200).json({ products: uniqueProducts });
+    // Transform products to match app's expected format
+    const transformedProducts = uniqueProducts.map(product => ({
+      id: product.productId, // Change productId to id
+      price: product.price,
+      brand: product.brand,
+      taste: product.taste,
+      img: product.img,
+      dis: product.dis,
+      category: product.category,
+      petType: product.petType,
+      quantity: product.quantity,
+      saleAmmount: product.saleAmmount,
+      salePrice: product.salePrice,
+    }));
+
+    // Return the transformed products
+    res.status(200).json({ products: transformedProducts });
   } catch (e) {
-    console.error('Server error:', e);
+    console.error("Server error:", e);
     res.status(500).json({ error: true, errorMessage: e.message });
   }
 };
 
-  
-  
-
-
-  
 
 const getAllUsers = async (req, res) => {
   try {
@@ -230,5 +237,5 @@ module.exports = {
   logIn,
   updateUserProducts,
   getUserProducts,
-  updateUserProductsTest
+  updateUserProductsTest,
 };
